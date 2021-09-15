@@ -12,8 +12,7 @@ import qualified Prelude as P
 --
 -- It might be thought of as a list, with a maximum length of one.
 data Optional a =
-  Full a
-  | Empty
+  Full a | Empty
   deriving (Eq, Show)
 
 -- | Map the given function on the possible value.
@@ -32,7 +31,7 @@ mapOptional f (Full a) = Full (f a)
 
 -- | Bind the given function on the possible value.
 --
--- >>> bindOptional Full Empty
+-- >>> bindOptional - Empty
 -- Empty
 --
 -- >>> bindOptional (\n -> if even n then Full (n - 1) else Full (n + 1)) (Full 8)
@@ -44,8 +43,8 @@ bindOptional ::
   (a -> Optional b)
   -> Optional a
   -> Optional b
-bindOptional =
-  error "todo: Course.Optional#bindOptional"
+bindOptional f Empty = Empty
+bindOptional f (Full a) = f a
 
 -- | Return the possible value if it exists; otherwise, the second argument.
 --
@@ -58,8 +57,8 @@ bindOptional =
   Optional a
   -> a
   -> a
-(??) =
-  error "todo: Course.Optional#(??)"
+(??) Empty a = a
+(??) (Full a) _ = a
 
 -- | Try the first optional for a value. If it has a value, use it; otherwise,
 -- use the second value.
@@ -79,8 +78,8 @@ bindOptional =
   Optional a
   -> Optional a
   -> Optional a
-(<+>) =
-  error "todo: Course.Optional#(<+>)"
+(<+>) Empty b = b
+(<+>) (Full a) _ = Full a
 
 -- | Replaces the Full and Empty constructors in an optional.
 --
@@ -88,14 +87,14 @@ bindOptional =
 -- 9
 --
 -- >>> optional (+1) 0 Empty
--- 0
+-- 0tt
 optional ::
   (a -> b)
   -> b
   -> Optional a
   -> b
-optional =
-  error "todo: Course.Optional#optional"
+optional f a Empty = a
+optional f _ (Full a) = f a
 
 applyOptional :: Optional (a -> b) -> Optional a -> Optional b
 applyOptional f a = bindOptional (\f' -> mapOptional f' a) f
